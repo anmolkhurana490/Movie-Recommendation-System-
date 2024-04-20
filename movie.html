@@ -1,0 +1,44 @@
+<!doctype html>
+<head>
+	<title>Movie Recommendation System</title>
+	<link rel="stylesheet" href="{{url_for('static', filename='movie.css')}}">
+	<script src="{{url_for('static', filename='movie.js')}}"></script>
+	<script src="{{url_for('static', filename='jquery-3.7.1.js')}}"></script>
+</head>
+<body>
+	<h1>Movie Recommendation System</h1>
+	<form class="search-container" method="post" action='/'>
+		<label for="search-input">What do you like to watch?</label>
+		<div class="search-input-container">
+			<input type="text" name="search-input" id="search-input" placeholder="Search Movie by Title, Genre, Year">
+			<button type="submit">Search</button>
+		</div>
+	</form>
+	<div class="main-container">
+		<h2>
+			{% if search_input %}
+				Searched For: "{{search_input}}"
+				<script>document.getElementById("search-input").defaultValue="{{search_input}}";</script>
+			{% else %}
+				Recommended For You
+			{% endif %}
+		</h2>
+		{% if movies %}
+			<div class="movies-container" id="movies-container">
+				{% for movie_data in movies %}
+					<a class="movie" onclick="movie_clicked('{{movie_data.id}}')">
+						<img src="{{url_for('static', filename=movie_data.thumbnail_location)}}">
+						{{movie_data.title}}
+						({{movie_data.release_year}})
+					</a>
+				{% endfor %}
+			</div>
+			
+			<button id="show-more-button" onclick="load_more_data()">Show More »</button>
+			<div id="loading-spinner" style="display: none;">Loading...</div>
+			{% else %}
+				<h3>No Result Found!</h3>
+		{% endif %}
+	</div>
+<body>
+</html>
