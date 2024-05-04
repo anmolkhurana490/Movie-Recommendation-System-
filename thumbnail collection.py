@@ -5,7 +5,7 @@ import threading
 import time
 
 # TMDb API key
-api_key="1d36b09ad72e809c27a05b7a9649c11f"
+api_key="your-api-key"
 
 movies_data = pd.read_csv("datasets/processed_data.csv")
 
