@@ -1,54 +1,14 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 import pickle
-#pd.set_option('display.max_columns', None)
 
-#reading dataset
-movies=pd.read_csv("tmdb_5000_movies.csv")
+#pd.set_option("display.max_rows", None)
+movie_data=pd.read_csv("datasets/processed_data.csv")
 
-#choosing only important features
-data=movies[['id', 'genres', 'original_language', 'popularity', 'release_date', 'vote_average', 'title']]
-
-#checking and removing null values
-print(data.isna().sum())
-data.dropna(inplace=True)
-#print(data.nunique())
-
-#preprocessing genres
-def convert_to_text(data):
-	processed=[]
-	for dic in eval(data):
-		processed.append(dic['name'].lower().strip())
-	if len(processed)==0:
-		processed.append('none')
-	return processed
-
-data['genres']=data['genres'].apply(convert_to_text)
-#print(data)
-
-data['release_year']=data['release_date'].apply(lambda date: int(date.split('-')[0]))
-
-scaler=MinMaxScaler()
-data['popularity']=scaler.fit_transform(data[['popularity']])
-data['vote_average']=scaler.fit_transform(data[['vote_average']])
-
-#preprocessing languages
-lang_values=data.original_language.value_counts()
-rare_lang=lang_values[lang_values<=5].index
-print(rare_lang)
-data.loc[data.original_language.isin(rare_lang), "original_language"]="other"
-
-#text extraction by encoding text data
-genre_dummies=pd.get_dummies(data.genres.apply(pd.Series).stack(), prefix="genre").groupby(level=0).sum().drop("genre_none", axis=1)
-#print(genre_dummies)
-language_dummies=pd.get_dummies(data.original_language, prefix="lang", dtype=int).drop("lang_other", axis=1)
-#print(language_dummies)
-
-movie_data=pd.concat([genre_dummies, language_dummies, data.drop(["genres", "original_language", "release_date"], axis=1)], axis=1)
-xdata=movie_data.drop(["id", "title"], axis=1)
+xdata=movie_data.drop(["id", "title", "list_genres", "keywords", "original_language", "scaled_year", "popularity", "list_companies"], axis=1)
 print(xdata.columns)
 
 #Elbow Method for finding no. of clusters
@@ -62,24 +22,32 @@ sse=[]
 #plt.plot(rng, sse)
 #plt.show()
 
-model=KMeans(n_clusters=10, n_init='auto')
-movie_data['clusters']=model.fit_predict(xdata)
+model=KMeans(n_clusters=67, n_init='auto')
+
+pca=PCA(0.95)
+x_pca=pca.fit_transform(xdata)
+movie_data['clusters']=model.fit_predict(x_pca)
 
 centroid=model.cluster_centers_
 #print("cluster centroids:", centroid)
 
 #Performance metrics in clustering
-score=silhouette_score(xdata, movie_data.clusters)
+score=silhouette_score(x_pca, movie_data.clusters)
 print("score:", score)
 
 #Saving clustered model
-with open("model.pickle", 'wb') as file:
+with open("models/kmeans_model.pickle", 'wb') as file:
 	pickle.dump(model, file)
 	
-#saving processed data
-movie_data.to_csv("processed_data.csv", index=False)
+#Saving pca model
+with open("models/pca_model.pickle", 'wb') as file:
+	pickle.dump(pca, file)
 
-def get_input_data(genres, lang, year, popularity, vote_average):
+#saving processed data
+processed_data=movie_data.rename(columns={'genres': 'list_genres', 'production_companies': 'list_companies'})
+processed_data.to_csv("datasets/processed_data.csv", index=False)
+
+def get_input_data(genres, lang, year, companies, vote_avg):
 	cols=list(xdata.columns)
 	data=np.zeros(len(cols))
 	
@@ -87,16 +55,20 @@ def get_input_data(genres, lang, year, popularity, vote_average):
 		if "genre_"+genre in cols:
 			data[cols.index("genre_"+genre)]=1
 	
+	for company in companies:
+		if "company_"+company in cols:
+			data[cols.index("company_"+company)]=1
+	
 	if "lang_"+lang in cols:
 		data[cols.index("lang_"+lang)]=True
 	
 	data[cols.index("release_year")]=year
-	data[cols.index("popularity")]=popularity
-	data[cols.index("vote_average")]=vote_average
-	return data.reshape(1,-1)
+	#data[cols.index("popularity")]=popularity
+	data[cols.index("vote_average")]=vote_avg
+	return pca.transform(data.reshape(1,-1))
 
-def recommend_movies(genre=[], lang='en', year=2010, popularity=10, vote_average=5, num=10):
-	data=get_input_data(genre, lang, year, popularity, vote_average)
+def recommend_movies(genre=[], lang='en', year=2010, company=[], vote_avg=1, num=10):
+	data=get_input_data(genre, lang, year, company, vote_avg)
 	cluster=model.predict(data)[0]
 	cluster_movies=movie_data[movie_data.clusters==cluster]
 	recommended=cluster_movies.sort_values(by="popularity", ascending=False)
