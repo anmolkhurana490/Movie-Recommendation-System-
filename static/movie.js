@@ -1,3 +1,36 @@
+function filter_movies(){
+	$('#loading-spinner').show();
+	$('#movies-container').hide();
+	$('#show-more-button').hide();
+	
+	$.ajax({
+		url: '/filter-movies',
+    	type: 'GET',
+    	data: $('#filter-form').serialize(),
+    	success: function(response){
+    		newMovies = response.data;
+    		//console.log(newMovies)
+    		$("#movies-container").empty();
+    		for (var i = 0; i < newMovies.length; i++) {
+        		var movie_data = newMovies[i];
+        		var movieTemplate = `<a class="movie" onclick="movie_clicked('${movie_data.id}')">
+						<img src="static/${movie_data.thumbnail_location}">
+						${movie_data.title} (${movie_data.release_year})
+					</a>
+            	`;
+            	$('#movies-container').append(movieTemplate);
+            }
+    		
+    		$('#loading-spinner').hide();
+			$('#movies-container').show();
+			$('#show-more-button').show();
+    	},
+    	error: function(error){
+    		console.error("Error:", error);
+    	}
+	});
+}
+
 //to fetch the movies on which user clicked
 function movie_clicked(id){
 	console.log("movie id clicked:", id);
@@ -55,3 +88,10 @@ function shortenTitle(title, maxlength=40){
 		return title;
 	}
 }
+
+//to show Performace Metrics
+fetch('/get_metrics')
+    .then(response => response.json())
+    .then(data => console.log("Performance:", data.metrics))
+    .catch(error => console.error(error));
+    

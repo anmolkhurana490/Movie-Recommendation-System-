@@ -21,7 +21,7 @@ h1 {
 	margin: 5px 0px;
 }
 
-.search-container label {
+.search-container, .filter-form label {
 	color: yellow;
 	margin-top: 5px;
 }
@@ -48,6 +48,49 @@ h1 {
 	background-color: #007bff;
 }
 
+.filter-form {
+	border: 1px white;
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 0px;
+	width: 95%;
+	height: 20px;
+}
+
+.filter-group {
+	margin-right: 10px;
+	padding: 0px 5px;
+	width: 25%;
+	height: 100%;
+}
+
+.filter-group label {
+	margin-right: 5px;
+}
+
+.filter-form select {
+	background-color: white;
+	color: black;
+	width: 50%;
+	height: 100%;
+	border: 1px;
+	border-radius: 3px;
+}
+
+.filter-form button {
+	width: 10%;
+	height: 100%;
+	background-color: red;
+	color: white;
+	font-weight: bold;
+	border: 1px;
+	border-radius: 3px;
+}
+
+.filter-form button:hover {
+	background-color: #007bff;
+}
+
 .main-container {
 	color: white;
 }
@@ -59,15 +102,15 @@ h1 {
 
 .movies-container {
 	display: grid;
-	grid-template-columns: repeat(4,1fr);
-	grid-column-gap: 30px;
-	grid-row-gap: 30px;
+	grid-template-columns: repeat(5,1fr);
+	grid-column-gap: 20px;
+	grid-row-gap: 20px;
 }
 
 .movie {
 	color: white;
 	text-align: center;
-	height: 300px;
+	height: 400px;
 	text-decoration: None;
 	font-size: 110%;
 }
