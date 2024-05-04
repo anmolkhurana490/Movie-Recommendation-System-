@@ -42,13 +42,13 @@ def get_thumbnails(movie_id, lang):
 		print(movie_id, "Image successfully downloaded")
     
 threads = []
-'''for index, movie in movies_data[['id', 'lang_code']].iterrows():
+for index, movie in movies_data[['id', 'lang_code']].iterrows():
 	thread = threading.Thread(target=get_thumbnails, args=(movie.id, movie.lang_code))
 	threads.append(thread)
 	thread.start()
 
 for thread in threads:
-	thread.join()'''
+	thread.join()
 
 movies_data['thumbnail_location'] = movies_data['id'].apply(lambda id: f"thumbnails/{id}.jpg")
 movies_data.drop("lang_code", axis=1, inplace=True)
