@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: FlaskApp
+    env: python
+    plan: free
+    buildCommand: ""
+    buildCommand: python thumbnail_collection.py
+    startCommand: gunicorn app:app
