@@ -1,29 +1,34 @@
 <!doctype html>
+
 <head>
 	<title>Movie Recommendation System</title>
 	<link rel="stylesheet" href="{{url_for('static', filename='movie.css')}}">
 	<script src="{{url_for('static', filename='movie.js')}}"></script>
 	<script src="{{url_for('static', filename='jquery-3.7.1.js')}}"></script>
 </head>
+
 <body>
 	<h1>Movie Recommendation System</h1>
+
 	<form class="search-container" method="post" action='/'>
 		<label for="search-input">What do you like to watch?</label>
 		<div class="search-input-container">
-			<input type="text" name="search-input" id="search-input" placeholder="Search Movie by Title or Keyword" required>
+			<input type="text" name="search-input" id="search-input" placeholder="Search Movie by Title or Keyword"
+				required>
 			<button type="submit">Search</button>
 		</div>
 	</form>
+
 	<form class="filter-form" id="filter-form">
 		<div class="filter-group">
 			<label for="select_genres">Genres:</label>
 			<select name="select_genres" id="select-genres">
 				<option value="all">All</option>
 				{% if options["genres"] %}
-					{% for genre in options["genres"] %}
-						<option value={{genre}}>{{genre|capitalize}}</option>
-					{% endfor %}
-					<option value="other">Other</option>
+				{% for genre in options["genres"] %}
+				<option value={{genre}}>{{genre|capitalize}}</option>
+				{% endfor %}
+				<option value="other">Other</option>
 				{% endif %}
 			</select>
 		</div>
@@ -32,10 +37,10 @@
 			<select name="select_language">
 				<option value="all">All</option>
 				{% if options["languages"] %}
-					{% for language in options["languages"] %}
-						<option value={{language}}>{{language}}</option>
-					{% endfor %}
-					<option value="other">Other</option>
+				{% for language in options["languages"] %}
+				<option value={{language}}>{{language}}</option>
+				{% endfor %}
+				<option value="other">Other</option>
 				{% endif %}
 			</select>
 		</div>
@@ -44,39 +49,47 @@
 			<select name="select_year">
 				<option value="all">Choose Year</option>
 				{% if options["release_year"] %}
-					{% for year in options["release_year"] | reverse %}
-						<option value={{year}}>{{year}}</option>
-					{% endfor %}
+				{% for year in options["release_year"] | reverse %}
+				<option value={{year}}>{{year}}</option>
+				{% endfor %}
 				{% endif %}
 			</select>
 		</div>
 		<button type="button" onclick="filter_movies()">Apply</button>
 	</form>
+
 	<div class="main-container">
 		<h2 id="main-heading">
 			{% if search_input %}
-				Searched For: "{{search_input}}"
-				<script>document.getElementById("search-input").defaultValue="{{search_input}}";</script>
+			Searched For: "{{search_input}}"
+			<script>document.getElementById("search-input").defaultValue = "{{search_input}}";</script>
 			{% else %}
-				Recommended For You
+			Recommended For You
 			{% endif %}
 		</h2>
+
 		{% if movies %}
-			<div class="movies-container" id="movies-container">
-				{% for movie_data in movies %}
-					<a class="movie" onclick="movie_clicked('{{movie_data.id}}')">
-						<img src="{{url_for('static', filename=movie_data.thumbnail_location)}}">
-						{{movie_data.title}}
-						({{movie_data.release_year}})
-					</a>
-				{% endfor %}
-			</div>
-			
-			<button id="show-more-button" onclick="load_more_data()">Show More »</button>
-			<div id="loading-spinner" style="display: none;">Loading...</div>
-			{% else %}
-				<h3>No Result Found!</h3>
+		<div class="movies-container" id="movies-container">
+			{% for movie_data in movies %}
+
+			<a class="movie" id={{movie_data.id}} onclick="movie_clicked('{{movie_data.id}}')">
+				<img src="{{url_for('static', filename=movie_data.thumbnail_location)}}">
+				{{movie_data.title}}
+				({{movie_data.release_year}})
+				<div class='like'></div>
+			</a>
+
+			{% endfor %}
+		</div>
+
+		<button id="show-more-button" onclick="load_more_data()">Show More »</button>
+		<div id="loading-spinner" style="display: none;">Loading...</div>
+		{% else %}
+		<h3>No Result Found!</h3>
 		{% endif %}
+
 	</div>
-<body>
+
+	<body>
+
 </html>

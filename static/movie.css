@@ -21,7 +21,8 @@ h1 {
 	margin: 5px 0px;
 }
 
-.search-container, .filter-form label {
+.search-container,
+.filter-form label {
 	color: yellow;
 	margin-top: 5px;
 }
@@ -102,7 +103,7 @@ h1 {
 
 .movies-container {
 	display: grid;
-	grid-template-columns: repeat(5,1fr);
+	grid-template-columns: repeat(5, 1fr);
 	grid-column-gap: 20px;
 	grid-row-gap: 20px;
 }
@@ -113,6 +114,7 @@ h1 {
 	height: 400px;
 	text-decoration: None;
 	font-size: 110%;
+	position: relative;
 }
 
 .movie:hover {
@@ -128,7 +130,43 @@ h1 {
 	margin-bottom: 1px;
 }
 
-#show-more-button, #loading-spinner {
+.like {
+	background: url('icons/heart.png') no-repeat center;
+	background-size: contain;
+	position: absolute;
+	top: 25%;
+	left: 35%;
+	width: 30%;
+	height: 30%;
+	z-index: 100;
+	display: none;
+}
+
+.movie.liked img {
+	opacity: 0.7;
+}
+
+.movie.liked .like {
+	display: block;
+	animation: like 0.5s ease-in-out 1;
+}
+
+@keyframes like {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.2);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+#show-more-button,
+#loading-spinner {
 	color: white;
 	font-size: 15px;
 	background-color: black;
